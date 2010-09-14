@@ -1,0 +1,200 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[danish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr} % hoved- og sidefod
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{amssymb,amsmath}
+\usepackage{graphicx}
+\pagestyle{fancy} 
+\lhead{Algoritmer\\ og datastrukturer}
+\rhead{Ugeopgave 2\\ Morten Rasmussen}
+\lstset{ 
+language=Python,                % choose the language of the code
+basicstyle=\footnotesize,       % the size of the fonts that are used for the code
+numbers=left,                   % where to put the line-numbers
+numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+stepnumber=1,                   % the step between two line-numbers. If it's 1 each line will be numbered
+numbersep=5pt,                  % how far the line-numbers are from the code
+showspaces=false,               % show spaces adding particular underscores
+showstringspaces=false,         % underline spaces within strings
+showtabs=false,                 % show tabs within strings adding particular underscores
+%frame=single,	                % adds a frame around the code
+tabsize=4,	                % sets default tabsize to 2 spaces
+captionpos=b,                   % sets the caption-position to bottom
+breaklines=true,                % sets automatic line breaking
+breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+title=\lstname,                 % show the filename of files included with \lstinputlisting; also try caption instead of title
+%escapeinside={\%*}{*)}          % if you want to add a comment within your code
+}
+
+
+\begin{document}
+\title{
+\Huge Algoritmer og datastrukturer\\
+\LARGE Ugeopgave 2.\\
+\Large \emph{Young tableaus}
+}
+\author{Morten Rasmussen \\ cruise@diku.dk}
+\maketitle
+\newpage
+
+\section*{Question a)}
+Et eksempel på hvordan en \emph{Young tabuleau} med følgende tal værdier\\
+\{9,16,3,2,4,8,5,14,12\}\\\\
+$ Y = 
+\begin{pmatrix}
+2 & 3 & 4 & 5 \\
+8 & 9 & 12 & \infty \\
+14 & 16 & \infty & \infty \\
+\infty & \infty & \infty & \infty
+\end{pmatrix}
+$
+
+\section*{Question b)}
+Hvis $Y$ er en nxm matrice vil værdien i $Y[1,1]$ kun kunne indeholde værdien $\infty$ hvis resten af matricen
+har værdien $\infty$ altså er matricen er tom. 
+$\infty$ ikke skal agtes som en reel værdi og derfor er der et åbent felt i matricen.
+Da maticen har egenskaben at $Y[i,j] <= Y[i+1,j]$ og $Y[i,j] <= Y[i,j+1]$.
+Derfor vil værdien i $Y[1,1]$ kun være $\infty$ hvis værdien i $Y[1 .. m,1 .. n]$ ligeledes
+er den samme eller større og da ikke findes en reel værdi større end $\infty$ vil det være alle
+andre værdier være $\infty$.
+Ligeledes er vil det være tilfældet at hvis $Y[n,m] < \infty$ vil matricen være fuld, da
+matricen kun vil indeholde reele værdier og der så ikke vil være nogen pladser som er udfyldt med
+$\infty$ og derfor må matricen være fuld. Da matricen har følgende egenskab.\\
+$Y[m,n] >= Y[m-j,n]$ og $Y[m,n] >= Y[m,n-j]$. Så hvis værdien i matricens største index ikke er
+$\infty$ må matricen være fuld.
+
+\section*{Question c)}
+Da vi lige har fastslået i opgave b) at det mindste element i en \emph{Young tabular} altid kan 
+findes i punktet 1,1. Er det let at finde det mindste element, Det skal dog udskiftes med et tomt
+element altså $\infty$ dette gør dog at der opstår et problem hvis antallet af ikke $\infty$ værdier
+overskrider 1. I Det tilfælde vil egenskaben der gør dette muligt ikke længere være opfyldt.
+Da elementerne i matricen ikke vil være i sorteret rækkefølge længere. Derfor vil
+det være nødvendigt at sortere tabularen efterfølgende så egenskaben bibeholdes.
+Den måde det gøres på er ved at havde en \emph{YOUNGIFY} der sørger for at placere det nye $\infty$ det
+korrekte sted og placere den mindste værdi i $Y[1,1]$. Den måde algoritmen virker på er ved
+at bevæge det nye $\infty$ ved at sammenligne det venstre barn med det højre barn også bytte om på
+roden og det barn som er mindst af de to. Det er speciel tilfælde hvor vi bevæger os langs højre kant
+af matricen og bunden hvor at den skal sammen ligne med hhv. den næste nedaf og til højre i matricen.
+Jeg har valgt at implementere \emph{EXTRACT-MIN} i rigtig python kode. Jeg mener at det blev sagt til en forelæsning at 
+det ville være fint nok. Jeg har ydermere på absalon uploaded kildekode med main og test funktion.
+\emph{Young tabularen} er blevet implementeret som en liste af lister, alle indlejrede lister skal havde samme længde.
+Python lister er 0 indekseret.
+\label{Python kode til EXTRACT-MIN funktion på young tabulars}
+\begin{lstlisting}
+def EXTRACT_MIN(A):
+	min = A[0][0]
+	A[0][0] = Decimal('infinity')
+	A = YOUNGIFY(A,0,0)
+	return (A,min)
+
+
+def YOUNGIFY(A,i,j):
+	#Standing at the buttom and right most index
+	if len(A)-1 == i and len(A[0])-1 == j:
+		return A
+	# Standing at the last row
+	elif	len(A)-1 == i:
+		if A[i][j+1] <= A[i][j]:
+			a = A[i][j]
+			A[i][j] = A[i][j+1]
+			A[i][j+1] = a
+		YOUNGIFY(A,i,j+1)
+	# Standing at the last column
+	elif	len(A[0])-1 == j:
+		if A[i+1][j] <= A[i][j]:
+			a = A[i][j]
+			A[i][j] = A[i+1][j]
+			A[i+1][j] = a
+		YOUNGIFY(A,i+1,j)
+	# Somewhere in the midle of the matrice
+	else:
+		if A[i+1][j] <= A[i][j+1] and A[i+1][j] < A[i][j]:
+				a = A[i][j]
+				A[i][j] = A[i+1][j]
+				A[i+1][j] = a
+				YOUNGIFY(A,i+1,j)
+		
+		elif A[i+1][j] > A[i][j+1] and A[i][j+1] < A[i][j]:
+				a = A[i][j]
+				A[i][j] = A[i][j+1]
+				A[i][j+1] = a
+				YOUNGIFY(A,i,j+1)		 
+	return A
+\end{lstlisting}
+
+Denne algoritme kører med worst case running time $O(n+m)$ da den rekursivt kører igennem matricen
+og hver gang bliver i eller j inkrementeret og i og j altid er mindre end lige med n og m. \\
+\begin{equation}
+T(p) = O(1) + T(p+1)
+\end{equation}
+Hvis $p$ er lige med $m+n$.
+Dette er lig med:
+\begin{equation}
+O(p) = O(m+n)
+\end{equation}
+
+\section*{Question d)}
+For at indsætte et nyt element er det krævet at der er plads i $m$x$n$ matricen.
+Det ved vi fra tidligere at hvis $Y[m,n]$ er $\infty$ så er der plads i listen.
+Måden jeg indsætter er ved at indsætte den nye værdi på index $m,n$, og lade
+denne værdi vandre op i matricen indtil der at den er sorteret.
+Det gøres ved at se på de to forælde, hvilken der er størst og så længe værdien
+er mindre så bytter de to plads. Hvis det ikke er tilfældet kontrolleres
+der om den mindste forældre er større end en værdien. Hvis det ikke er tilfældet
+på værdien stå korrekt. Der er dog special tilfælde når vi $j = 0$ og $i = 0$,
+hvor vi så skal bevæge os hen imod 0,0. Vertikalt eller horizontal i alt efter
+hvilken af de to værdier er 0.
+\label{Python kode til INSERT funktion på young tabulars}
+\begin{lstlisting}
+def INSERT(A,k):
+	if A[len(A)-1][len(A[0])-1] == Decimal('infinity'):
+		m = len(A)-1
+		n = len(A[0])-1 
+		A[m][n] = k	
+		A = DECREASE_KEY(A,m,n)	
+	return A
+
+
+def DECREASE_KEY(A,i,j):	
+	young = False
+	while (i > 0 or j > 0) and not young:
+		if i == 0:
+			if A[i][j] < A[i][j-1]:
+				a = A[i][j]
+				A[i][j] = A[i][j-1]
+				A[i][j-1] = a
+				j -= 1
+			else:
+				young = True
+		elif j == 0:
+			if A[i][j] < A[i-1][j]:
+				a = A[i][j]
+				A[i][j] = A[i-1][j]
+				A[i-1][j] = a
+				i -= 1
+			else:
+				young = True
+		else:
+			if A[i][j-1] < A[i-1][j]:
+				if A[i][j] < A[i-1][j]:
+					a = A[i][j]
+					A[i][j] = A[i-1][j]
+					A[i-1][j] = a
+				i -= 1
+			else:
+				if A[i][j] < A[i][j-1]:
+					a = A[i][j]
+					A[i][j] = A[i][j-1]
+					A[i][j-1] = a
+				else:
+					young = True
+				j -= 1
+				
+	return A
+\end{lstlisting}
+Igen kan det siges at $O(m+n)$ da $i$ eller $j$ decrementeres for hver gang værdien bevæges nærmere sit slut punkt,
+og sammen med at da de to værdier ikke kan blive mindre end 0(det er dog forudsat ens lister er 0 indekseret).
+\end{document}
