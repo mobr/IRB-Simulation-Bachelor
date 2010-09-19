@@ -1,4 +1,4 @@
-\documentclass[a4paper, 12pt]{article}
+\documentclass[a4paper, 10pt]{article}
 \usepackage[danish]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -42,16 +42,19 @@ project is is to develop a way to create objects inside the prototype using proc
 
 \subsection*{Topic delimitations}
 	\begin{itemize}
-	\item The project will be limited to simple structures like cubes and spheres. 
+	\item The project will be limited to primitives e.g. cubes and spheres and there combinations. 
 	\item It will only be possible to create and place objects by inputting parameters and not by dragging and
 	dropping.
 	\item The objects will be presumed to be made of a homogeneous material to easier calculate center of gravity
 	\end{itemize}
 \subsection*{Motivation}
-The problem to be solved by this prototype, It can be cumbersome to test physics engines when time has to be wasted
+It can be cumbersome to test physics engines when time has to be wasted
 setting up test scenarios in standard tools. If its possible to use procedural modelling to make test data it will
-improve the workflow for benchmarking physic engines. It will make it easier to set up different test environments. 
+improve the workflow for benchmarking physic engines. It will make it easier to set up different test environments and recycle the scenarios with
+different configurations. 
 
+These scenarios will be made out of primitives and combinations of primitives, so an obvious criteria for the project is to make it 
+easy to setup and change large sets of primitives.
 With procedural content creation it is possible to create completely different test cases with only a few minor changes
 to the input. With procedural content creation it is easy to create large test scenarios that will test the limits of the
 physics engine. 
@@ -61,4 +64,15 @@ and a better benchmarking tool. These complex scenarios will contribute to a mor
 \subsection*{Evaluation}
 To complete our goal we will need to write a data structure that can hold relevant attributes for a 3D object and can be
 created procedurally. We need to design a way with which the object can be created within the benchmarking tool.
+\subsection*{Project schedule}
+\begin{description}
+\item[Friday 24. September] Hand in of synopsis
+\item[]Research of physics and 3D engine
+\item[]Code digging in existing prototype
+\item[]Analyse of problem and its solution
+\item[]Extending prototype with procedural content creation
+\item[]Writing report
+\item[Tuesday 11. January] Hand in of report
+\item[27-28 January] Defence of project
+\end{description}
 \end{document}
